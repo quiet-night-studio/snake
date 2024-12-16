@@ -1,13 +1,23 @@
 extends CharacterBody2D
 
+var snake_body: PackedScene = preload("res://scenes/snake/snake_body.tscn")
+
 enum Direction { UP, DOWN, LEFT, RIGHT }
+
 var current_direction := Direction.RIGHT
 var move_timer := 0.0
 var move_delay := 0.2  # Adjust this to control snake speed
 var grid_size := 8  # Size of each movement step
 
+var pieces: Array
+var position_history: Array[Vector2]
+
+
 func _ready() -> void:
 	position = position.snapped(Vector2(grid_size, grid_size))
+	Signals.food_eaten.connect(_on_food_eaten)
+	position_history.push_front(position)
+
 
 func _physics_process(delta: float) -> void:
 	# This code adds constraints for some cases.
@@ -38,4 +48,22 @@ func _physics_process(delta: float) -> void:
 
 		velocity = move_vector * (grid_size / delta)
 		move_and_slide()
+
 		position = position.snapped(Vector2(grid_size, grid_size))
+		position_history.push_front(position)
+
+		for i in range(pieces.size()):
+			var target_position = position_history[i]
+			pieces[i].position = target_position
+
+
+func _on_food_eaten() -> void:
+	var body_scene: Area2D = snake_body.instantiate()
+
+	if pieces.is_empty():
+		body_scene.position = position
+	else:
+		body_scene.position = pieces[-1].position
+
+	owner.call_deferred("add_child",body_scene)
+	pieces.append(body_scene)
