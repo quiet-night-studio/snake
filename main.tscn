@@ -176,17 +176,11 @@ tile_set = SubResource("TileSet_jcb3g")
 [node name="Snake" parent="." instance=ExtResource("2_qofr4")]
 position = Vector2(96, 96)
 
-[node name="Food" parent="." instance=ExtResource("3_sbamg")]
-position = Vector2(120, 96)
-
 [node name="Food2" parent="." instance=ExtResource("3_sbamg")]
 position = Vector2(256, 96)
 
 [node name="Food3" parent="." instance=ExtResource("3_sbamg")]
 position = Vector2(224, 96)
-
-[node name="Food4" parent="." instance=ExtResource("3_sbamg")]
-position = Vector2(120, 96)
 
 [node name="Food5" parent="." instance=ExtResource("3_sbamg")]
 position = Vector2(192, 96)

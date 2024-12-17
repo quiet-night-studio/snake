@@ -8,6 +8,7 @@ var current_direction := Direction.RIGHT
 var move_timer := 0.0
 var move_delay := 0.2  # Adjust this to control snake speed
 var grid_size := 8  # Size of each movement step
+var move_vector := Vector2.ZERO
 
 var pieces: Array
 var position_history: Array[Vector2]
@@ -35,7 +36,6 @@ func _physics_process(delta: float) -> void:
 	if move_timer >= move_delay:
 		move_timer = 0.0
 
-		var move_vector := Vector2.ZERO
 		match current_direction:
 			Direction.UP:
 				move_vector = Vector2.UP
@@ -53,7 +53,7 @@ func _physics_process(delta: float) -> void:
 		position_history.push_front(position)
 
 		for i in range(pieces.size()):
-			var target_position = position_history[i]
+			var target_position = position_history[i+1]
 			pieces[i].position = target_position
 
 
@@ -61,7 +61,7 @@ func _on_food_eaten() -> void:
 	var body_scene: Area2D = snake_body.instantiate()
 
 	if pieces.is_empty():
-		body_scene.position = position
+		body_scene.position = position - (move_vector * 8)
 	else:
 		body_scene.position = pieces[-1].position
 
