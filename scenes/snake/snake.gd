@@ -2,7 +2,8 @@ extends CharacterBody2D
 
 var snake_body: PackedScene = preload("res://scenes/snake/snake_body.tscn")
 
-@onready var area_2d: Area2D = $Area2D
+@onready var collision_area: Area2D = $CollisionArea
+@onready var drop_area: Area2D = $DropArea
 
 enum Direction { UP, DOWN, LEFT, RIGHT }
 
@@ -20,12 +21,18 @@ func _ready() -> void:
 	position = position.snapped(Vector2(grid_size, grid_size))
 	Signals.food_eaten.connect(_on_food_eaten)
 	position_history.push_front(position)
-	area_2d.area_entered.connect(_on_area_entered)
+	collision_area.area_entered.connect(_on_collision_area_entered)
+	drop_area.area_entered.connect(_on_drop_area_entered)
 
 
-func _on_area_entered(area: Area2D) -> void:
+func _on_drop_area_entered(area: Area2D) -> void:
 	print(area.name)
-	# Should die
+	print("YOU PICKED UP SOMETHING")
+
+
+func _on_collision_area_entered(area: Area2D) -> void:
+	print(area.name)
+	print("YOU DIED")
 
 
 func _physics_process(delta: float) -> void:

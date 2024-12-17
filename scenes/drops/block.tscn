@@ -1,8 +1,16 @@
-[gd_scene load_steps=2 format=3 uid="uid://covaumqrp1821"]
+[gd_scene load_steps=3 format=3 uid="uid://covaumqrp1821"]
+
+[ext_resource type="Texture2D" uid="uid://ca0dh8f5hjicv" path="res://assets/default/tiles/tile_0017.png" id="1_pltde"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_c8mhm"]
+size = Vector2(8, 8)
 
 [node name="Block" type="Area2D"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(4, 4)
 shape = SubResource("RectangleShape2D_c8mhm")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_pltde")
+centered = false
