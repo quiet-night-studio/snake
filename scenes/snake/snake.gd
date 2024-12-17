@@ -82,3 +82,5 @@ func _on_food_eaten() -> void:
 
 	owner.call_deferred("add_child", body_scene)
 	pieces.append(body_scene)
+
+	Signals.points_updated.emit()
