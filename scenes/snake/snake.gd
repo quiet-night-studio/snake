@@ -18,11 +18,19 @@ var position_history: Array[Vector2]
 
 
 func _ready() -> void:
-	position = position.snapped(Vector2(grid_size, grid_size))
 	Signals.food_eaten.connect(_on_food_eaten)
+	Signals.player_died.connect(_on_player_died)
+
+	position = position.snapped(Vector2(grid_size, grid_size))
 	position_history.push_front(position)
 	collision_area.area_entered.connect(_on_collision_area_entered)
+	collision_area.body_entered.connect(_on_collision_body_entered)
+
 	drop_area.area_entered.connect(_on_drop_area_entered)
+
+
+func _on_player_died() -> void:
+	queue_free()
 
 
 func _on_drop_area_entered(area: Area2D) -> void:
@@ -30,9 +38,14 @@ func _on_drop_area_entered(area: Area2D) -> void:
 	print("YOU PICKED UP SOMETHING")
 
 
+func _on_collision_body_entered(body: Node2D) -> void:
+	print("body: ", body.name)
+	Signals.player_died.emit()
+
+
 func _on_collision_area_entered(area: Area2D) -> void:
-	print(area.name)
-	print("YOU DIED")
+	print("area: ", area.name)
+	Signals.player_died.emit()
 
 
 func _physics_process(delta: float) -> void:

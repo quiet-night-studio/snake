@@ -11,6 +11,7 @@ const GRID_SIZE: int = 8
 @onready var timer: Timer = $Timer
 @onready var tilemap: TileMapLayer = $TileMapLayer
 @onready var points_label: Label = %PointsLabel
+@onready var death_panel_container: PanelContainer = %DeathPanelContainer
 
 var drops_list: Array[PackedScene] = [block, ghost, fruit, reverse, speed_slow]
 
@@ -18,6 +19,14 @@ var drops_list: Array[PackedScene] = [block, ghost, fruit, reverse, speed_slow]
 func _ready() -> void:
 	timer.timeout.connect(_on_timer_timeout)
 	Signals.points_updated.connect(_on_points_updated)
+	Signals.player_died.connect(_on_player_died)
+
+	death_panel_container.visible = false
+
+
+func _on_player_died() -> void:
+	timer.stop()
+	death_panel_container.visible = true
 
 
 func _on_points_updated() -> void:
