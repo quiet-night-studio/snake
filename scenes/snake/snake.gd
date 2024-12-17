@@ -68,7 +68,7 @@ func _physics_process(delta: float) -> void:
 		position_history.push_front(position)
 
 		for i in range(pieces.size()):
-			var target_position = position_history[i+1]
+			var target_position = position_history[i + 1]
 			pieces[i].position = target_position
 
 
@@ -80,5 +80,5 @@ func _on_food_eaten() -> void:
 	else:
 		body_scene.position = pieces[-1].position
 
-	owner.call_deferred("add_child",body_scene)
+	owner.call_deferred("add_child", body_scene)
 	pieces.append(body_scene)

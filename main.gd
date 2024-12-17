@@ -29,32 +29,32 @@ func get_random_position() -> Vector2:
 	# Get random coordinates within the used rect
 	var random_x = randi_range(used_rect.position.x, used_rect.end.x - 10)
 	var random_y = randi_range(used_rect.position.y, used_rect.end.y - 10)
-	
+
 	# Convert tile coordinates to world position
 	var world_position = tilemap.map_to_local(Vector2i(random_x, random_y))
-	
+
 	# Snap to grid
 	return world_position.snapped(Vector2(GRID_SIZE, GRID_SIZE))
 
 
 func spawn_drop(drop_scene: PackedScene) -> void:
 	var drop = drop_scene.instantiate()
-	
+
 	# Get a valid position
-	var position = get_random_position()
-	
+	var valid_position = get_random_position()
+
 	# Make sure the position is valid (not occupied by walls or other drops)
-	while not is_position_valid(position):
-		position = get_random_position()
-	
-	drop.position = position
+	while not is_position_valid(valid_position):
+		valid_position = get_random_position()
+
+	drop.position = valid_position
 	add_child(drop)
 
 
 func is_position_valid(pos: Vector2) -> bool:
 	# Convert world position to tile coordinates
 	var tile_pos = tilemap.local_to_map(pos)
-	
+
 	# Check if there's a wall or obstacle at this position
 	var tile_data = tilemap.get_cell_tile_data(tile_pos)
 	if tile_data:
@@ -65,5 +65,5 @@ func is_position_valid(pos: Vector2) -> bool:
 	for child in get_children():
 		if child.has_method("is_drop") and child.position == pos:
 			return false
-	
+
 	return true
