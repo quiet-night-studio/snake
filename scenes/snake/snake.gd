@@ -2,6 +2,8 @@ extends CharacterBody2D
 
 var snake_body: PackedScene = preload("res://scenes/snake/snake_body.tscn")
 
+@onready var area_2d: Area2D = $Area2D
+
 enum Direction { UP, DOWN, LEFT, RIGHT }
 
 var current_direction := Direction.RIGHT
@@ -18,6 +20,11 @@ func _ready() -> void:
 	position = position.snapped(Vector2(grid_size, grid_size))
 	Signals.food_eaten.connect(_on_food_eaten)
 	position_history.push_front(position)
+	area_2d.area_entered.connect(_on_area_entered)
+
+
+func _on_area_entered(area: Area2D) -> void:
+	print(area.name)
 
 
 func _physics_process(delta: float) -> void:

@@ -3,17 +3,16 @@
 [ext_resource type="Texture2D" uid="uid://txehyoexwpd1" path="res://assets/default/tiles/tile_0098.png" id="1_g1mfj"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dko68"]
-size = Vector2(8, 8)
+size = Vector2(5, 4)
 
 [node name="SnakeBody" type="Area2D"]
-position = Vector2(96, 88)
 collision_layer = 4
 collision_mask = 0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(4, 4)
-shape = SubResource("RectangleShape2D_dko68")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_g1mfj")
 centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(4, 4)
+shape = SubResource("RectangleShape2D_dko68")
