@@ -25,6 +25,7 @@ func _ready() -> void:
 
 func _on_area_entered(area: Area2D) -> void:
 	print(area.name)
+	# Should die
 
 
 func _physics_process(delta: float) -> void:
