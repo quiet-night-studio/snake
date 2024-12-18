@@ -6,14 +6,16 @@ var snake_body: PackedScene = preload("res://scenes/snake/snake_body.tscn")
 @onready var drop_area: Area2D = $DropArea
 @onready var ghost_timer: Timer = %GhostTimer
 @onready var sprite_2d: Sprite2D = $Sprite2D
+@onready var reverse_timer: Timer = %ReverseTimer
 
 enum Direction { UP, DOWN, LEFT, RIGHT }
 
 var current_direction := Direction.RIGHT
-var move_timer := 0.0
-var move_delay := 0.2  # Adjust this to control snake speed
-var grid_size := 8  # Size of each movement step
-var move_vector := Vector2.ZERO
+var move_timer: float = 0.0
+var move_delay: float = 0.2  # Adjust this to control snake speed
+var grid_size: int = 8  # Size of each movement step
+var move_vector: Vector2 = Vector2.ZERO
+var reverse_active: bool = false
 
 var pieces: Array
 var position_history: Array[Vector2]
@@ -23,14 +25,27 @@ func _ready() -> void:
 	Signals.food_eaten.connect(_on_food_eaten)
 	Signals.ghost_eaten.connect(_on_ghost_eaten)
 	Signals.player_died.connect(_on_player_died)
+	Signals.reverse_eaten.connect(_on_reverse_eaten)
 
 	collision_area.area_entered.connect(_on_collision_area_entered)
 	drop_area.area_entered.connect(_on_drop_area_entered)
 
 	ghost_timer.timeout.connect(_ghost_timer_timeout)
+	reverse_timer.timeout.connect(_on_reverse_timer_timeout)
 
 	position = position.snapped(Vector2(grid_size, grid_size))
 	position_history.push_front(position)
+
+
+func _on_reverse_timer_timeout() -> void:
+	sprite_2d.modulate = Color(1, 1, 1, 1)
+	reverse_active = false
+
+
+func _on_reverse_eaten() -> void:
+	sprite_2d.modulate = Color(1, 0, 0, 1)
+	reverse_timer.start()
+	reverse_active = true
 
 
 func _ghost_timer_timeout() -> void:
@@ -61,14 +76,24 @@ func _on_collision_area_entered(area: Area2D) -> void:
 func _physics_process(delta: float) -> void:
 	# This code adds constraints for some cases.
 	# Eg.: The snake cannot go down when it's goind up.
-	if Input.is_action_just_pressed("ui_up") and current_direction != Direction.DOWN:
-		current_direction = Direction.UP
-	elif Input.is_action_just_pressed("ui_down") and current_direction != Direction.UP:
-		current_direction = Direction.DOWN
-	elif Input.is_action_just_pressed("ui_left") and current_direction != Direction.RIGHT:
-		current_direction = Direction.LEFT
-	elif Input.is_action_just_pressed("ui_right") and current_direction != Direction.LEFT:
-		current_direction = Direction.RIGHT
+	if reverse_active:
+		if Input.is_action_just_pressed("ui_up") and current_direction != Direction.UP:
+			current_direction = Direction.DOWN
+		elif Input.is_action_just_pressed("ui_down") and current_direction != Direction.DOWN:
+			current_direction = Direction.UP
+		elif Input.is_action_just_pressed("ui_left") and current_direction != Direction.LEFT:
+			current_direction = Direction.RIGHT
+		elif Input.is_action_just_pressed("ui_right") and current_direction != Direction.RIGHT:
+			current_direction = Direction.LEFT
+	else:
+		if Input.is_action_just_pressed("ui_up") and current_direction != Direction.DOWN:
+			current_direction = Direction.UP
+		elif Input.is_action_just_pressed("ui_down") and current_direction != Direction.UP:
+			current_direction = Direction.DOWN
+		elif Input.is_action_just_pressed("ui_left") and current_direction != Direction.RIGHT:
+			current_direction = Direction.LEFT
+		elif Input.is_action_just_pressed("ui_right") and current_direction != Direction.LEFT:
+			current_direction = Direction.RIGHT
 
 	move_timer += delta
 	if move_timer >= move_delay:

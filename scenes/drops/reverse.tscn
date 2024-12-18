@@ -1,8 +1,20 @@
-[gd_scene load_steps=2 format=3 uid="uid://cqges66731d6c"]
+[gd_scene load_steps=4 format=3 uid="uid://cqges66731d6c"]
+
+[ext_resource type="Texture2D" uid="uid://cliuvkwohabaq" path="res://assets/default/tiles/tile_0111.png" id="1_hi4wj"]
+[ext_resource type="Script" path="res://scenes/drops/reverse.gd" id="1_r8k6l"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ojenr"]
+size = Vector2(8, 8)
 
 [node name="Reverse" type="Area2D"]
+collision_layer = 8
+collision_mask = 8
+script = ExtResource("1_r8k6l")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(4, 4)
 shape = SubResource("RectangleShape2D_ojenr")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_hi4wj")
+centered = false

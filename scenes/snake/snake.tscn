@@ -52,3 +52,7 @@ shape = SubResource("RectangleShape2D_h7cbx")
 [node name="GhostTimer" type="Timer" parent="Timers"]
 unique_name_in_owner = true
 wait_time = 10.0
+
+[node name="ReverseTimer" type="Timer" parent="Timers"]
+unique_name_in_owner = true
+wait_time = 4.0
