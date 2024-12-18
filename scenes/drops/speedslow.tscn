@@ -1,8 +1,20 @@
-[gd_scene load_steps=2 format=3 uid="uid://dtr7mrp52aclj"]
+[gd_scene load_steps=4 format=3 uid="uid://dtr7mrp52aclj"]
+
+[ext_resource type="Script" path="res://scenes/drops/speedslow.gd" id="1_dggjr"]
+[ext_resource type="Texture2D" uid="uid://duqtnkq4bpk57" path="res://assets/default/tiles/tile_0008.png" id="2_jm08a"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ugipr"]
+size = Vector2(8, 8)
 
 [node name="SpeedSlow" type="Area2D"]
+collision_layer = 8
+collision_mask = 8
+script = ExtResource("1_dggjr")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(4, 4)
 shape = SubResource("RectangleShape2D_ugipr")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_jm08a")
+centered = false

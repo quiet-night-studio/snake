@@ -56,3 +56,7 @@ wait_time = 10.0
 [node name="ReverseTimer" type="Timer" parent="Timers"]
 unique_name_in_owner = true
 wait_time = 4.0
+
+[node name="SpeedSlowTimer" type="Timer" parent="Timers"]
+unique_name_in_owner = true
+wait_time = 4.0

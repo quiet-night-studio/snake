@@ -7,6 +7,7 @@ var snake_body: PackedScene = preload("res://scenes/snake/snake_body.tscn")
 @onready var ghost_timer: Timer = %GhostTimer
 @onready var sprite_2d: Sprite2D = $Sprite2D
 @onready var reverse_timer: Timer = %ReverseTimer
+@onready var speed_slow_timer: Timer = %SpeedSlowTimer
 
 enum Direction { UP, DOWN, LEFT, RIGHT }
 
@@ -26,15 +27,30 @@ func _ready() -> void:
 	Signals.ghost_eaten.connect(_on_ghost_eaten)
 	Signals.player_died.connect(_on_player_died)
 	Signals.reverse_eaten.connect(_on_reverse_eaten)
+	Signals.speedslow_eaten.connect(_on_speedslow_eaten)
 
 	collision_area.area_entered.connect(_on_collision_area_entered)
 	drop_area.area_entered.connect(_on_drop_area_entered)
 
 	ghost_timer.timeout.connect(_ghost_timer_timeout)
 	reverse_timer.timeout.connect(_on_reverse_timer_timeout)
+	speed_slow_timer.timeout.connect(_on_speed_slow_timer_timeout)
 
 	position = position.snapped(Vector2(grid_size, grid_size))
 	position_history.push_front(position)
+
+
+func _on_speed_slow_timer_timeout() -> void:
+	move_delay = 0.2
+
+
+func _on_speedslow_eaten() -> void:
+	if randf() < 0.5:
+		move_delay = 0.1
+	else:
+		move_delay = 0.4
+
+	speed_slow_timer.start()
 
 
 func _on_reverse_timer_timeout() -> void:
