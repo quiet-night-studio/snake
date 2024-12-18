@@ -66,3 +66,7 @@ ui_down={
 2d_physics/layer_2="snake"
 2d_physics/layer_3="snake_body"
 2d_physics/layer_4="drops"
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0

@@ -4,6 +4,8 @@ var snake_body: PackedScene = preload("res://scenes/snake/snake_body.tscn")
 
 @onready var collision_area: Area2D = $CollisionArea
 @onready var drop_area: Area2D = $DropArea
+@onready var ghost_timer: Timer = %GhostTimer
+@onready var sprite_2d: Sprite2D = $Sprite2D
 
 enum Direction { UP, DOWN, LEFT, RIGHT }
 
@@ -19,28 +21,36 @@ var position_history: Array[Vector2]
 
 func _ready() -> void:
 	Signals.food_eaten.connect(_on_food_eaten)
+	Signals.ghost_eaten.connect(_on_ghost_eaten)
 	Signals.player_died.connect(_on_player_died)
+
+	collision_area.area_entered.connect(_on_collision_area_entered)
+	drop_area.area_entered.connect(_on_drop_area_entered)
+
+	ghost_timer.timeout.connect(_ghost_timer_timeout)
 
 	position = position.snapped(Vector2(grid_size, grid_size))
 	position_history.push_front(position)
-	collision_area.area_entered.connect(_on_collision_area_entered)
-	collision_area.body_entered.connect(_on_collision_body_entered)
 
-	drop_area.area_entered.connect(_on_drop_area_entered)
+
+func _ghost_timer_timeout() -> void:
+	collision_area.monitoring = true
+	sprite_2d.modulate = Color(1, 1, 1, 1)
+
+
+func _on_ghost_eaten() -> void:
+	collision_area.monitoring = false
+	ghost_timer.start()
+	sprite_2d.modulate = Color(1, 1, 1, 0.5)
 
 
 func _on_player_died() -> void:
 	queue_free()
 
 
+# I could delete this method. The detection and signal emission is already done in the drop script.
 func _on_drop_area_entered(area: Area2D) -> void:
-	print(area.name)
-	print("YOU PICKED UP SOMETHING")
-
-
-func _on_collision_body_entered(body: Node2D) -> void:
-	print("body: ", body.name)
-	Signals.player_died.emit()
+	print("collected: ", area.name)
 
 
 func _on_collision_area_entered(area: Area2D) -> void:

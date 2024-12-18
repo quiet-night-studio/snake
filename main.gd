@@ -13,7 +13,8 @@ const GRID_SIZE: int = 8
 @onready var points_label: Label = %PointsLabel
 @onready var death_panel_container: PanelContainer = %DeathPanelContainer
 
-var drops_list: Array[PackedScene] = [block, ghost, fruit, reverse, speed_slow]
+# var drops_list: Array[PackedScene] = [block, ghost, fruit, reverse, speed_slow]
+var drops_list: Array[PackedScene] = [block, ghost, fruit]
 
 
 func _ready() -> void:

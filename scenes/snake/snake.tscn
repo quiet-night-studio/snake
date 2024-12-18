@@ -13,7 +13,7 @@ size = Vector2(8, 8)
 size = Vector2(8, 8)
 
 [node name="Snake" type="CharacterBody2D"]
-collision_layer = 2
+collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_fbf3u")
 
@@ -22,7 +22,9 @@ texture = ExtResource("1_cn6i6")
 centered = false
 
 [node name="CollisionArea" type="Area2D" parent="."]
-collision_layer = 0
+visible = false
+modulate = Color(0, 1, 0, 1)
+collision_layer = 5
 collision_mask = 5
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionArea"]
@@ -30,8 +32,10 @@ position = Vector2(4, 4)
 shape = SubResource("RectangleShape2D_t8fud")
 
 [node name="DropArea" type="Area2D" parent="."]
+visible = false
+modulate = Color(1, 0, 1, 1)
 position = Vector2(8, 8)
-collision_layer = 0
+collision_layer = 8
 collision_mask = 8
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DropArea"]
@@ -42,3 +46,9 @@ shape = SubResource("RectangleShape2D_bct8i")
 visible = false
 position = Vector2(4, 4)
 shape = SubResource("RectangleShape2D_h7cbx")
+
+[node name="Timers" type="Node" parent="."]
+
+[node name="GhostTimer" type="Timer" parent="Timers"]
+unique_name_in_owner = true
+wait_time = 10.0
