@@ -20,7 +20,7 @@ const GRID_SIZE: int = 8
 @onready var counter_panel_container: PanelContainer = %CounterPanelContainer
 @onready var score_label: Label = %ScoreLabel
 
-var drops_list: Array[PackedScene] = [block, ghost, fruit, reverse, speed_slow]
+var drops_list: Array[PackedScene] = [block, ghost, reverse, speed_slow]
 
 
 func _ready() -> void:
@@ -61,7 +61,10 @@ func _on_points_updated() -> void:
 
 
 func _on_drops_timer_timeout() -> void:
-	spawn_drop(drops_list.pick_random())
+	if randf() > 0.4:
+		spawn_drop(fruit)
+	else:
+		spawn_drop(drops_list.pick_random())
 
 
 func get_random_position() -> Vector2:
