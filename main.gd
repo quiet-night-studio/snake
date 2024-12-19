@@ -40,6 +40,7 @@ enum GameState { MENU, PLAYING, GAME_OVER }
 @onready var score_label: Label = %ScoreLabel
 @onready var tens: Sprite2D = %Tens
 @onready var units: Sprite2D = %Units
+@onready var try_again_button: Button = %TryAgainButton
 
 var current_state: GameState = GameState.MENU
 var total_points: int = 0
@@ -47,12 +48,12 @@ var drops_list: Array[PackedScene]
 
 
 func _ready() -> void:
-	setup_drops_list()
-	setup_connections()
-	initialize_game()
+	_setup_drops_list()
+	_setup_connections()
+	_initialize_game()
 
 
-func setup_drops_list() -> void:
+func _setup_drops_list() -> void:
 	drops_list = [
 		Scenes.DROPS.REVERSE,
 		Scenes.DROPS.GHOST,
@@ -62,44 +63,54 @@ func setup_drops_list() -> void:
 	]
 
 
-func setup_connections() -> void:
+func _setup_connections() -> void:
 	Signals.points_updated.connect(_on_points_updated)
-	Signals.player_died.connect(end_game)
-	drops_timer.timeout.connect(spawn_random_drop)
-	start_button.pressed.connect(start_game)
+	Signals.player_died.connect(_end_game)
+	drops_timer.timeout.connect(_spawn_random_drop)
+	start_button.pressed.connect(_start_game)
+	try_again_button.pressed.connect(_start_game)
 
 
-func initialize_game() -> void:
+func _initialize_game() -> void:
 	current_state = GameState.MENU
 	total_points = 0
-	update_ui_visibility()
+	_update_ui_visibility()
 
 
-func update_ui_visibility() -> void:
+func _update_ui_visibility() -> void:
 	menu_panel_container.visible = current_state == GameState.MENU
 	counter_panel_container.visible = current_state == GameState.PLAYING
 	death_panel_container.visible = current_state == GameState.GAME_OVER
 
 
-func start_game() -> void:
+func clear_stage() -> void:
+	for child in $Drops.get_children():
+		child.queue_free()
+
+	for child in $SnakePieces.get_children():
+		child.queue_free()
+
+
+func _start_game() -> void:
 	current_state = GameState.PLAYING
 	total_points = 0
-	points_label.text = "0"
-	spawn_snake()
+	_spawn_snake()
 	drops_timer.start()
-	update_ui_visibility()
+	_update_ui_visibility()
 
 
-func end_game() -> void:
+func _end_game() -> void:
 	current_state = GameState.GAME_OVER
 	drops_timer.stop()
-	update_score_display()
-	update_ui_visibility()
+	_update_ui_visibility()
+	_update_score_display()
+	clear_stage()
 
 
-func spawn_snake() -> void:
+func _spawn_snake() -> void:
 	var snake: Node = Scenes.SNAKE.instantiate()
-	snake.position = Vector2(200, 208)  # Consider making this configurable
+	snake.pieces_container = $SnakePieces
+	snake.position = Vector2(200, 208)
 	add_child(snake)
 
 
@@ -112,37 +123,37 @@ func _on_points_updated() -> void:
 	units.texture = number_textures[u]
 
 
-func update_score_display() -> void:
+func _update_score_display() -> void:
 	var points_suffix = "point" + ("s" if total_points != 1 else "")
 	score_label.text = "You scored %d %s!" % [total_points, points_suffix]
 
 
-func spawn_random_drop() -> void:
+func _spawn_random_drop() -> void:
 	var drop_scene: PackedScene
 	if randf() <= DROP_WEIGHTS.FRUIT:
 		drop_scene = Scenes.DROPS.FRUIT
 	else:
 		drop_scene = drops_list.pick_random()
 
-	spawn_drop(drop_scene)
+	_spawn_drop(drop_scene)
 
 
-func spawn_drop(drop_scene: PackedScene) -> void:
+func _spawn_drop(drop_scene: PackedScene) -> void:
 	var drop = drop_scene.instantiate()
-	var valid_position = get_valid_spawn_position()
+	var valid_position = _get_valid_spawn_position()
 	drop.position = valid_position
-	add_child(drop)
+	$Drops.add_child(drop)
 
 
 # Everything below this line is AI generated code
 # with some manual adjustments.
-func get_valid_spawn_position() -> Vector2:
-	var pos = get_random_position()
+func _get_valid_spawn_position() -> Vector2:
+	var pos = _get_random_position()
 	var max_attempts := 100
 	var attempts := 0
 
-	while not is_position_valid(pos) and attempts < max_attempts:
-		pos = get_random_position()
+	while not _is_position_valid(pos) and attempts < max_attempts:
+		pos = _get_random_position()
 		attempts += 1
 
 	if attempts >= max_attempts:
@@ -151,7 +162,7 @@ func get_valid_spawn_position() -> Vector2:
 	return pos
 
 
-func get_random_position() -> Vector2:
+func _get_random_position() -> Vector2:
 	var used_rect := tilemap.get_used_rect()
 	var random_x = randi_range(used_rect.position.x, used_rect.end.x - 10)
 	var random_y = randi_range(used_rect.position.y, used_rect.end.y - 10)
@@ -159,32 +170,32 @@ func get_random_position() -> Vector2:
 	return world_position.snapped(Vector2(GRID_SIZE, GRID_SIZE))
 
 
-func is_position_valid(pos: Vector2) -> bool:
+func _is_position_valid(pos: Vector2) -> bool:
 	var tile_pos = tilemap.local_to_map(pos)
 
-	if is_position_out_of_bounds(tile_pos):
+	if _is_position_out_of_bounds(tile_pos):
 		return false
 
-	if has_obstacle_at_position(tile_pos):
+	if _has_obstacle_at_position(tile_pos):
 		return false
 
-	if has_drop_at_position(pos):
+	if _has_drop_at_position(pos):
 		return false
 
 	return true
 
 
-func is_position_out_of_bounds(tile_pos: Vector2i) -> bool:
+func _is_position_out_of_bounds(tile_pos: Vector2i) -> bool:
 	var used_rect = tilemap.get_used_rect()
 	return not used_rect.has_point(tile_pos)
 
 
-func has_obstacle_at_position(tile_pos: Vector2i) -> bool:
+func _has_obstacle_at_position(tile_pos: Vector2i) -> bool:
 	var tile_data = tilemap.get_cell_tile_data(tile_pos)
 	return tile_data != null
 
 
-func has_drop_at_position(pos: Vector2) -> bool:
+func _has_drop_at_position(pos: Vector2) -> bool:
 	for child in get_children():
 		if child.has_method("is_drop") and child.position == pos:
 			return true

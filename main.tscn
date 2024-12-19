@@ -355,6 +355,7 @@ wait_time = 3.0
 
 [node name="CounterPanelContainer" type="PanelContainer" parent="CanvasLayer"]
 unique_name_in_owner = true
+visible = false
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -415,8 +416,14 @@ layout_mode = 2
 text = "X points"
 horizontal_alignment = 1
 
+[node name="TryAgainButton" type="Button" parent="CanvasLayer/DeathPanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "TRY AGAIN?"
+
 [node name="MenuPanelContainer" type="PanelContainer" parent="CanvasLayer"]
 unique_name_in_owner = true
+visible = false
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -440,3 +447,7 @@ text = "Menu"
 unique_name_in_owner = true
 layout_mode = 2
 text = "Start"
+
+[node name="Drops" type="Node" parent="."]
+
+[node name="SnakePieces" type="Node" parent="."]

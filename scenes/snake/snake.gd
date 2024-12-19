@@ -3,14 +3,14 @@ extends CharacterBody2D
 const SPEED_STATES = {"NORMAL": 0.2, "FAST": 0.1, "SLOW": 0.4}
 const SPEED_BOOST_CHANCE: float = 0.5
 
+enum Direction { UP, DOWN, LEFT, RIGHT }
+
 @onready var collision_area: Area2D = $CollisionArea
 @onready var drop_area: Area2D = $DropArea
 @onready var ghost_timer: Timer = %GhostTimer
 @onready var sprite_2d: Sprite2D = $Sprite2D
 @onready var reverse_timer: Timer = %ReverseTimer
 @onready var speed_slow_timer: Timer = %SpeedSlowTimer
-
-enum Direction { UP, DOWN, LEFT, RIGHT }
 
 var snake_body: PackedScene = preload("res://scenes/snake/snake_body.tscn")
 
@@ -23,6 +23,7 @@ var reverse_active: bool = false
 var current_speed_state: String = "NORMAL"
 var pieces: Array
 var position_history: Array[Vector2]
+var pieces_container: Node
 
 
 func _ready() -> void:
@@ -79,6 +80,8 @@ func _on_ghost_eaten() -> void:
 
 
 func _on_player_died() -> void:
+	position_history.clear()
+	pieces.clear()
 	queue_free()
 
 
@@ -151,7 +154,7 @@ func _on_food_eaten() -> void:
 	var body_scene: Area2D = snake_body.instantiate()
 	body_scene.position = _calculate_spawn_position()
 
-	get_parent().call_deferred("add_child", body_scene)
+	pieces_container.call_deferred("add_child", body_scene)
 	pieces.append(body_scene)
 
 	Signals.points_updated.emit()
