@@ -93,13 +93,13 @@ func _on_collision_area_entered(_area: Area2D) -> void:
 
 func _get_inverted_directions() -> void:
 	if Input.is_action_just_pressed("ui_up") and current_direction != Direction.UP:
-		current_direction = Direction.UP
-	elif Input.is_action_just_pressed("ui_down") and current_direction != Direction.DOWN:
 		current_direction = Direction.DOWN
+	elif Input.is_action_just_pressed("ui_down") and current_direction != Direction.DOWN:
+		current_direction = Direction.UP
 	elif Input.is_action_just_pressed("ui_left") and current_direction != Direction.LEFT:
-		current_direction = Direction.LEFT
-	elif Input.is_action_just_pressed("ui_right") and current_direction != Direction.RIGHT:
 		current_direction = Direction.RIGHT
+	elif Input.is_action_just_pressed("ui_right") and current_direction != Direction.RIGHT:
+		current_direction = Direction.LEFT
 
 
 func _get_normal_directions() -> void:
