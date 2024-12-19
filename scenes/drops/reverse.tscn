@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://cqges66731d6c"]
 
-[ext_resource type="Texture2D" uid="uid://cliuvkwohabaq" path="res://assets/default/tiles/tile_0111.png" id="1_hi4wj"]
 [ext_resource type="Script" path="res://scenes/drops/reverse.gd" id="1_r8k6l"]
+[ext_resource type="Texture2D" uid="uid://dd26nhh0hhm7y" path="res://assets/default/tiles/tile_0083.png" id="2_63ul4"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ojenr"]
 size = Vector2(6, 6)
@@ -12,9 +12,12 @@ collision_mask = 8
 script = ExtResource("1_r8k6l")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("1_hi4wj")
+position = Vector2(1, 1)
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("2_63ul4")
 centered = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
 position = Vector2(4, 4)
 shape = SubResource("RectangleShape2D_ojenr")
