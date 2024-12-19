@@ -66,6 +66,7 @@ ui_down={
 2d_physics/layer_2="snake"
 2d_physics/layer_3="snake_body"
 2d_physics/layer_4="drops"
+2d_physics/layer_5="walls"
 
 [rendering]
 

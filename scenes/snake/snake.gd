@@ -30,6 +30,8 @@ func _ready() -> void:
 	Signals.speedslow_eaten.connect(_on_speedslow_eaten)
 
 	collision_area.area_entered.connect(_on_collision_area_entered)
+	collision_area.body_entered.connect(_on_collision_body_entered)
+
 	drop_area.area_entered.connect(_on_drop_area_entered)
 
 	ghost_timer.timeout.connect(_ghost_timer_timeout)
@@ -65,12 +67,16 @@ func _on_reverse_eaten() -> void:
 
 
 func _ghost_timer_timeout() -> void:
-	collision_area.monitoring = true
+	# collision_area.monitoring = true
+	collision_area.collision_layer = 21
+	collision_area.collision_mask = 21
 	sprite_2d.modulate = Color(1, 1, 1, 1)
 
 
 func _on_ghost_eaten() -> void:
-	collision_area.monitoring = false
+	# collision_area.monitoring = false
+	collision_area.collision_layer = 16
+	collision_area.collision_mask = 16
 	ghost_timer.start()
 	sprite_2d.modulate = Color(1, 1, 1, 0.5)
 
@@ -84,8 +90,11 @@ func _on_drop_area_entered(area: Area2D) -> void:
 	print("collected: ", area.name)
 
 
-func _on_collision_area_entered(area: Area2D) -> void:
-	print("area: ", area.name)
+func _on_collision_body_entered(_body: Node2D) -> void:
+	Signals.player_died.emit()
+
+
+func _on_collision_area_entered(_area: Area2D) -> void:
 	Signals.player_died.emit()
 
 
