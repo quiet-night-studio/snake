@@ -90,6 +90,9 @@ func clear_stage() -> void:
 	for child in $SnakePieces.get_children():
 		child.queue_free()
 
+	tens.texture = number_textures[0]
+	units.texture = number_textures[0]
+
 
 func _start_game() -> void:
 	current_state = GameState.PLAYING
