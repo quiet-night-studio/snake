@@ -18,7 +18,7 @@ const Scenes = {
 enum GameState { MENU, PLAYING, GAME_OVER }
 
 @onready var drops_timer: Timer = $DropsTimer
-@onready var tilemap: TileMapLayer = $TileMapLayer
+@onready var tilemap: TileMapLayer = $WallsLayer
 @onready var points_label: Label = %PointsLabel
 @onready var death_panel_container: PanelContainer = %DeathPanelContainer
 @onready var start_button: Button = %StartButton
@@ -38,9 +38,7 @@ func _ready() -> void:
 
 
 func setup_drops_list() -> void:
-	drops_list = [
-		Scenes.DROPS.BLOCK, Scenes.DROPS.GHOST, Scenes.DROPS.REVERSE, Scenes.DROPS.SPEED_SLOW
-	]
+	drops_list = [Scenes.DROPS.REVERSE]
 
 
 func setup_connections() -> void:

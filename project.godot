@@ -23,6 +23,7 @@ Signals="*res://signals.gd"
 
 window/size/viewport_width=400
 window/size/viewport_height=320
+window/size/mode=2
 window/stretch/mode="viewport"
 
 [input]
