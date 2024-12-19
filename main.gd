@@ -117,8 +117,8 @@ func _spawn_snake() -> void:
 	add_child(snake)
 
 
-func _on_points_updated() -> void:
-	total_points += 1
+func _on_points_updated(points: int) -> void:
+	total_points += points
 	var t = total_points / 10
 	var u = total_points % 10
 

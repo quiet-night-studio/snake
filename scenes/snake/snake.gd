@@ -53,6 +53,7 @@ func _on_speedslow_eaten() -> void:
 	current_speed_state = "FAST" if randf() < SPEED_BOOST_CHANCE else "SLOW"
 	move_delay = SPEED_STATES[current_speed_state]
 	speed_slow_timer.start()
+	Signals.points_updated.emit(5)
 
 
 func _on_reverse_timer_timeout() -> void:
@@ -64,6 +65,7 @@ func _on_reverse_eaten() -> void:
 	sprite_2d.modulate = Color(1, 0, 0, 1)
 	reverse_timer.start()
 	reverse_active = true
+	Signals.points_updated.emit(10)
 
 
 func _ghost_timer_timeout() -> void:
@@ -77,6 +79,7 @@ func _on_ghost_eaten() -> void:
 	collision_area.collision_mask = 16
 	ghost_timer.start()
 	sprite_2d.modulate = Color(1, 1, 1, 0.5)
+	Signals.points_updated.emit(-1)
 
 
 func _on_player_died() -> void:
@@ -157,7 +160,7 @@ func _on_food_eaten() -> void:
 	pieces_container.call_deferred("add_child", body_scene)
 	pieces.append(body_scene)
 
-	Signals.points_updated.emit()
+	Signals.points_updated.emit(1)
 
 
 func _calculate_spawn_position() -> Vector2:
