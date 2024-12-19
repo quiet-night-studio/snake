@@ -67,14 +67,12 @@ func _on_reverse_eaten() -> void:
 
 
 func _ghost_timer_timeout() -> void:
-	# collision_area.monitoring = true
 	collision_area.collision_layer = 21
 	collision_area.collision_mask = 21
 	sprite_2d.modulate = Color(1, 1, 1, 1)
 
 
 func _on_ghost_eaten() -> void:
-	# collision_area.monitoring = false
 	collision_area.collision_layer = 16
 	collision_area.collision_mask = 16
 	ghost_timer.start()
@@ -153,7 +151,7 @@ func _on_food_eaten() -> void:
 	else:
 		body_scene.position = pieces[-1].position
 
-	owner.call_deferred("add_child", body_scene)
+	get_parent().call_deferred("add_child", body_scene)
 	pieces.append(body_scene)
 
 	Signals.points_updated.emit()

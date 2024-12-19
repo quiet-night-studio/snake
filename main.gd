@@ -1,42 +1,66 @@
 extends Node2D
 
+var snake_scene: PackedScene = preload("res://scenes/snake/snake.tscn")
+
 var block: PackedScene = preload("res://scenes/drops/block.tscn")
 var ghost: PackedScene = preload("res://scenes/drops/ghost.tscn")
 var fruit: PackedScene = preload("res://scenes/drops/fruit.tscn")
 var reverse: PackedScene = preload("res://scenes/drops/reverse.tscn")
 var speed_slow: PackedScene = preload("res://scenes/drops/speedslow.tscn")
+var total_points: int
 
 const GRID_SIZE: int = 8
 
-@onready var timer: Timer = $Timer
+@onready var drops_timer: Timer = $DropsTimer
 @onready var tilemap: TileMapLayer = $TileMapLayer
 @onready var points_label: Label = %PointsLabel
 @onready var death_panel_container: PanelContainer = %DeathPanelContainer
+@onready var start_button: Button = %StartButton
+@onready var menu_panel_container: PanelContainer = %MenuPanelContainer
+@onready var counter_panel_container: PanelContainer = %CounterPanelContainer
+@onready var score_label: Label = %ScoreLabel
 
-# var drops_list: Array[PackedScene] = [block, ghost, fruit, reverse, speed_slow]
-var drops_list: Array[PackedScene] = [speed_slow]
+var drops_list: Array[PackedScene] = [block, ghost, fruit, reverse, speed_slow]
 
 
 func _ready() -> void:
-	timer.timeout.connect(_on_timer_timeout)
+	drops_timer.timeout.connect(_on_drops_timer_timeout)
 	Signals.points_updated.connect(_on_points_updated)
 	Signals.player_died.connect(_on_player_died)
+	start_button.pressed.connect(_on_start_button_pressed)
 
 	death_panel_container.visible = false
 
 
+func _on_start_button_pressed() -> void:
+	menu_panel_container.visible = false
+	counter_panel_container.visible = true
+
+	drops_timer.start()
+	var snake: Node = snake_scene.instantiate()
+	add_child(snake)
+	snake.position = Vector2(200, 208)
+
+
 func _on_player_died() -> void:
-	timer.stop()
+	drops_timer.stop()
 	death_panel_container.visible = true
+
+	var points_text: String = " point"
+	if total_points != 1:
+		points_text += "s"
+
+	var score_text: String = "You scored " + str(total_points) + points_text + "!"
+
+	score_label.text = score_text
 
 
 func _on_points_updated() -> void:
-	var current_points = int(points_label.text)
-	current_points += 1
-	points_label.text = str(current_points)
+	total_points += 1
+	points_label.text = str(total_points)
 
 
-func _on_timer_timeout() -> void:
+func _on_drops_timer_timeout() -> void:
 	spawn_drop(drops_list.pick_random())
 
 
