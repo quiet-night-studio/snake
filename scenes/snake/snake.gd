@@ -1,6 +1,7 @@
 extends CharacterBody2D
 
-var snake_body: PackedScene = preload("res://scenes/snake/snake_body.tscn")
+const SPEED_STATES = {"NORMAL": 0.2, "FAST": 0.1, "SLOW": 0.4}
+const SPEED_BOOST_CHANCE: float = 0.5
 
 @onready var collision_area: Area2D = $CollisionArea
 @onready var drop_area: Area2D = $DropArea
@@ -11,13 +12,15 @@ var snake_body: PackedScene = preload("res://scenes/snake/snake_body.tscn")
 
 enum Direction { UP, DOWN, LEFT, RIGHT }
 
+var snake_body: PackedScene = preload("res://scenes/snake/snake_body.tscn")
+
 var current_direction := Direction.RIGHT
 var move_timer: float = 1.0
-var move_delay: float = 0.2  # Adjust this to control snake speed
-var grid_size: int = 8  # Size of each movement step
+var move_delay: float = 0.2
+var grid_size: int = 8
 var move_vector: Vector2 = Vector2.ZERO
 var reverse_active: bool = false
-
+var current_speed_state: String = "NORMAL"
 var pieces: Array
 var position_history: Array[Vector2]
 
@@ -32,8 +35,6 @@ func _ready() -> void:
 	collision_area.area_entered.connect(_on_collision_area_entered)
 	collision_area.body_entered.connect(_on_collision_body_entered)
 
-	drop_area.area_entered.connect(_on_drop_area_entered)
-
 	ghost_timer.timeout.connect(_ghost_timer_timeout)
 	reverse_timer.timeout.connect(_on_reverse_timer_timeout)
 	speed_slow_timer.timeout.connect(_on_speed_slow_timer_timeout)
@@ -43,15 +44,13 @@ func _ready() -> void:
 
 
 func _on_speed_slow_timer_timeout() -> void:
-	move_delay = 0.2
+	current_speed_state = "NORMAL"
+	move_delay = SPEED_STATES.NORMAL
 
 
 func _on_speedslow_eaten() -> void:
-	if randf() < 0.5:
-		move_delay = 0.1
-	else:
-		move_delay = 0.4
-
+	current_speed_state = "FAST" if randf() < SPEED_BOOST_CHANCE else "SLOW"
+	move_delay = SPEED_STATES[current_speed_state]
 	speed_slow_timer.start()
 
 
@@ -83,11 +82,7 @@ func _on_player_died() -> void:
 	queue_free()
 
 
-# I could delete this method. The detection and signal emission is already done in the drop script.
-func _on_drop_area_entered(area: Area2D) -> void:
-	print("collected: ", area.name)
-
-
+# This body detection is required to detect the collision with the walls.
 func _on_collision_body_entered(_body: Node2D) -> void:
 	Signals.player_died.emit()
 
@@ -96,27 +91,33 @@ func _on_collision_area_entered(_area: Area2D) -> void:
 	Signals.player_died.emit()
 
 
+func _get_inverted_directions() -> void:
+	if Input.is_action_just_pressed("ui_up") and current_direction != Direction.UP:
+		current_direction = Direction.UP
+	elif Input.is_action_just_pressed("ui_down") and current_direction != Direction.DOWN:
+		current_direction = Direction.DOWN
+	elif Input.is_action_just_pressed("ui_left") and current_direction != Direction.LEFT:
+		current_direction = Direction.LEFT
+	elif Input.is_action_just_pressed("ui_right") and current_direction != Direction.RIGHT:
+		current_direction = Direction.RIGHT
+
+
+func _get_normal_directions() -> void:
+	if Input.is_action_just_pressed("ui_up") and current_direction != Direction.DOWN:
+		current_direction = Direction.UP
+	elif Input.is_action_just_pressed("ui_down") and current_direction != Direction.UP:
+		current_direction = Direction.DOWN
+	elif Input.is_action_just_pressed("ui_left") and current_direction != Direction.RIGHT:
+		current_direction = Direction.LEFT
+	elif Input.is_action_just_pressed("ui_right") and current_direction != Direction.LEFT:
+		current_direction = Direction.RIGHT
+
+
 func _physics_process(delta: float) -> void:
-	# This code adds constraints for some cases.
-	# Eg.: The snake cannot go down when it's goind up.
 	if reverse_active:
-		if Input.is_action_just_pressed("ui_up") and current_direction != Direction.UP:
-			current_direction = Direction.DOWN
-		elif Input.is_action_just_pressed("ui_down") and current_direction != Direction.DOWN:
-			current_direction = Direction.UP
-		elif Input.is_action_just_pressed("ui_left") and current_direction != Direction.LEFT:
-			current_direction = Direction.RIGHT
-		elif Input.is_action_just_pressed("ui_right") and current_direction != Direction.RIGHT:
-			current_direction = Direction.LEFT
+		_get_inverted_directions()
 	else:
-		if Input.is_action_just_pressed("ui_up") and current_direction != Direction.DOWN:
-			current_direction = Direction.UP
-		elif Input.is_action_just_pressed("ui_down") and current_direction != Direction.UP:
-			current_direction = Direction.DOWN
-		elif Input.is_action_just_pressed("ui_left") and current_direction != Direction.RIGHT:
-			current_direction = Direction.LEFT
-		elif Input.is_action_just_pressed("ui_right") and current_direction != Direction.LEFT:
-			current_direction = Direction.RIGHT
+		_get_normal_directions()
 
 	move_timer += delta
 	if move_timer >= move_delay:
@@ -132,16 +133,14 @@ func _physics_process(delta: float) -> void:
 			Direction.RIGHT:
 				move_vector = Vector2.RIGHT
 
-		velocity = move_vector * (grid_size / delta)
-		move_and_slide()
-
+		position += move_vector * grid_size
 		position = position.snapped(Vector2(grid_size, grid_size))
 		position_history.push_front(position)
 
+		# Since the history array will always grow, we need to remove the last element
+		# to keep it with the same size as the pieces array.
 		if position_history.size() > pieces.size() + 1:
 			position_history.pop_back()
-
-		print(position_history.size(), " - ", pieces.size())
 
 		for i in range(pieces.size()):
 			var target_position = position_history[i + 1]
@@ -150,13 +149,15 @@ func _physics_process(delta: float) -> void:
 
 func _on_food_eaten() -> void:
 	var body_scene: Area2D = snake_body.instantiate()
-
-	if pieces.is_empty():
-		body_scene.position = position - (move_vector * 8)
-	else:
-		body_scene.position = pieces[-1].position
+	body_scene.position = _calculate_spawn_position()
 
 	get_parent().call_deferred("add_child", body_scene)
 	pieces.append(body_scene)
 
 	Signals.points_updated.emit()
+
+
+func _calculate_spawn_position() -> Vector2:
+	if pieces.is_empty():
+		return position - (move_vector * 8)
+	return pieces[-1].position
