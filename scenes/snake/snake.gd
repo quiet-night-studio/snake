@@ -12,7 +12,7 @@ var snake_body: PackedScene = preload("res://scenes/snake/snake_body.tscn")
 enum Direction { UP, DOWN, LEFT, RIGHT }
 
 var current_direction := Direction.RIGHT
-var move_timer: float = 0.0
+var move_timer: float = 1.0
 var move_delay: float = 0.2  # Adjust this to control snake speed
 var grid_size: int = 8  # Size of each movement step
 var move_vector: Vector2 = Vector2.ZERO
@@ -137,6 +137,11 @@ func _physics_process(delta: float) -> void:
 
 		position = position.snapped(Vector2(grid_size, grid_size))
 		position_history.push_front(position)
+
+		if position_history.size() > pieces.size() + 1:
+			position_history.pop_back()
+
+		print(position_history.size(), " - ", pieces.size())
 
 		for i in range(pieces.size()):
 			var target_position = position_history[i + 1]
