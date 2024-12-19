@@ -15,6 +15,19 @@ const Scenes = {
 	}
 }
 
+const number_textures = {
+	0: preload("res://assets/default/tiles/tile_0135.png"),
+	1: preload("res://assets/default/tiles/tile_0136.png"),
+	2: preload("res://assets/default/tiles/tile_0137.png"),
+	3: preload("res://assets/default/tiles/tile_0138.png"),
+	4: preload("res://assets/default/tiles/tile_0139.png"),
+	5: preload("res://assets/default/tiles/tile_0140.png"),
+	6: preload("res://assets/default/tiles/tile_0141.png"),
+	7: preload("res://assets/default/tiles/tile_0142.png"),
+	8: preload("res://assets/default/tiles/tile_0143.png"),
+	9: preload("res://assets/default/tiles/tile_0144.png")
+}
+
 enum GameState { MENU, PLAYING, GAME_OVER }
 
 @onready var drops_timer: Timer = $DropsTimer
@@ -25,6 +38,8 @@ enum GameState { MENU, PLAYING, GAME_OVER }
 @onready var menu_panel_container: PanelContainer = %MenuPanelContainer
 @onready var counter_panel_container: PanelContainer = %CounterPanelContainer
 @onready var score_label: Label = %ScoreLabel
+@onready var tens: Sprite2D = %Tens
+@onready var units: Sprite2D = %Units
 
 var current_state: GameState = GameState.MENU
 var total_points: int = 0
@@ -38,7 +53,13 @@ func _ready() -> void:
 
 
 func setup_drops_list() -> void:
-	drops_list = [Scenes.DROPS.REVERSE]
+	drops_list = [
+		Scenes.DROPS.REVERSE,
+		Scenes.DROPS.GHOST,
+		Scenes.DROPS.BLOCK,
+		Scenes.DROPS.SPEED_SLOW,
+		Scenes.DROPS.FRUIT
+	]
 
 
 func setup_connections() -> void:
@@ -84,7 +105,11 @@ func spawn_snake() -> void:
 
 func _on_points_updated() -> void:
 	total_points += 1
-	points_label.text = str(total_points)
+	var t = total_points / 10
+	var u = total_points % 10
+
+	tens.texture = number_textures[t]
+	units.texture = number_textures[u]
 
 
 func update_score_display() -> void:
